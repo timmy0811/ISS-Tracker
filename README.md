@@ -27,6 +27,8 @@ Some information may be outdated due to several updates on the GUI, however it's
 
 This is my first complete and bigger Python programm. It is API based and uses NASA's Open-Notify API to print the ISS-data live to the console. Furthermore it renderes a map based on user inputs and the API-data to the current project folder. The render frequency is set also by the users input with at least 1 second delay each period the data gets updated
 
+![_](latest_map.png?raw=true " ")
+
 <!-- INFORMATION  -->
 ## What does the Information mean?
 First of all the programm will ask you some questions how you want the programm to operate. 
