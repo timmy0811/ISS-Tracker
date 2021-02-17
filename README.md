@@ -110,7 +110,7 @@ IG: [timmy0811_](https://www.instagram.com/timmy0811_/)
 #ISS-Tracker by timmy0811   -   API based   1.1
 
 #Imports
-import requests, json, time, os, sys
+import requests, json, time, os, sys, pygame
 
 import numpy as np
 import matplotlib.pyplot as plot
@@ -123,6 +123,12 @@ from geopy.distance import geodesic
 from googletrans import Translator
 
 #Function declaration
+def useGUI():
+    GUI = input("Use a graphical GUI? (y/n): ")
+    if(GUI == "y"):
+        return True
+    else: return False
+
 def mapTypes(): #Choose map coloring 
     mapVariant = input('Chose a map type:   1) 2-Color      2) Bluemarble       3) Black-White      4) Shaded-Relief        ')
     return int(mapVariant)
@@ -196,9 +202,24 @@ def printLogo(): #Printing Logo in upper console
     print("___________________________________________________________________")
 
 #Setup and user-input
+
+
+bg = pygame.image.load("F:\Desktop\Folders\Programming\Python\ISS-Tracker\BgImage.jpg")
+
 printLogo()
-refresh_rate = setup()
 doDraw = drawMapDes()
+interface = useGUI()
+if (interface == False): refresh_rate = setup()
+
+if (interface):
+    pygame.init()
+    screen = pygame.display.set_mode((900, 400))
+    clock = pygame.time.Clock()
+    pygame.display.set_caption('ISS-Tracker     by timmy0811')
+
+    font = pygame.font.SysFont(None, 30)
+
+running = True
 
 geolocator = Nominatim(user_agent="Application")
 home_location = homelocationInput(geolocator)
@@ -219,6 +240,7 @@ parameters = {                          #Parameters for API request
 
 #Pre-Drawing the map based on user-input
 draw_map = 1
+main_count = 0
 
 fig = plot.figure(figsize = (12,9))
 
@@ -247,57 +269,105 @@ plot.title('Current ISS-Location', fontsize = 20)
 
 #Main cycle
 while(True):   
-    os.system("cls")
-    printLogo()
+    while (running):
+        if(interface):
+            for event in pygame.event.get():
+                if (event.type == pygame.QUIT):
+                    running = False
 
-    response = requests.get("http://api.open-notify.org/iss-now.json")
+        if(main_count == 10 or main_count == 0):
+            main_count = 1
 
-    responsePass = requests.get("http://api.open-notify.org/iss-pass.json", params = parameters)
-    passjson = responsePass.json()
+            os.system("cls")
+            printLogo()
 
-    text = response.json()
-    position = text["iss_position"]
+            response = requests.get("http://api.open-notify.org/iss-now.json")
 
-    iss_latitude = position['latitude']
-    iss_longitude = position['longitude']
+            responsePass = requests.get("http://api.open-notify.org/iss-pass.json", params = parameters)
+            passjson = responsePass.json()
 
-    past_locationy.append(None)
-    past_locationx.append(None)
+            text = response.json()
+            position = text["iss_position"]
 
-    past_locationy[n] = iss_latitude
-    past_locationx[n] = iss_longitude
-    n += 1
+            iss_latitude = position['latitude']
+            iss_longitude = position['longitude']
+
+            past_locationy.append(None)
+            past_locationx.append(None)
+
+            past_locationy[n] = iss_latitude
+            past_locationx[n] = iss_longitude
+            n += 1
      
-    #print("Latitude History:     " + str(past_locationy))
-    #print("Longitude History:    " + str(past_locationx))
+            #print("Latitude History:     " + str(past_locationy))
+            #print("Longitude History:    " + str(past_locationx))
 
-    #Print console log
-    print("Past Loc. in Bytes:   " + str(asizeof(past_locationy) + asizeof(past_locationx)))
+            #Print console log
+            if(interface == False):
+                print("Past Loc. in Bytes:   " + str(asizeof(past_locationy) + asizeof(past_locationx)))
 
-    print("Latitude:             " + iss_latitude + "°")
-    print("Longitude:            " + iss_longitude + "°")
-    adress = getadress(iss_latitude, iss_longitude, geolocator)
-    print("Location:             " + str(adress))
-    print("Translation:          " + translate(adress))
-    print("Distance to you:      " + str(int(distanceAB(home_location.latitude, home_location.longitude, iss_latitude, iss_longitude) * 1.609344)) + " Kilometers")
-    print("---------------------------------------")
-    print("People on ISS:        " + str(numberPep))
-    print("Names:                " + str(writePep(responsePep, pepjson)))
-    print("---------------------------------------")
-    print("Next pass:            " + str(datetime.fromtimestamp((passjson['response'])[0]['risetime'])))
-    print("Duration:             " + str((passjson['response'])[0]['duration']) + " seconds")
-    print(" ")
-    print("Second pass:          " + str(datetime.fromtimestamp((passjson['response'])[1]['risetime'])))
-    print("Duration:             " + str((passjson['response'])[1]['duration']) + " seconds")
-    print(" ")
-    print("Third pass:           " + str(datetime.fromtimestamp((passjson['response'])[2]['risetime'])))
-    print("Duration:             " + str((passjson['response'])[2]['duration']) + " seconds")
+                print("Latitude:             " + iss_latitude + "°")
+                print("Longitude:            " + iss_longitude + "°")
+                adress = getadress(iss_latitude, iss_longitude, geolocator)
+                print("Location:             " + str(adress))
+                print("Translation:          " + translate(adress))
+                print("Distance to you:      " + str(int(distanceAB(home_location.latitude, home_location.longitude, iss_latitude, iss_longitude) * 1.609344)) + " Kilometers")
+                print("---------------------------------------")
+                print("People on ISS:        " + str(numberPep))
+                print("Names:                " + str(writePep(responsePep, pepjson)))
+                print("---------------------------------------")
+                print("Next pass:            " + str(datetime.fromtimestamp((passjson['response'])[0]['risetime'])))
+                print("Duration:             " + str((passjson['response'])[0]['duration']) + " seconds")
+                print(" ")
+                print("Second pass:          " + str(datetime.fromtimestamp((passjson['response'])[1]['risetime'])))
+                print("Duration:             " + str((passjson['response'])[1]['duration']) + " seconds")
+                print(" ")
+                print("Third pass:           " + str(datetime.fromtimestamp((passjson['response'])[2]['risetime'])))
+                print("Duration:             " + str((passjson['response'])[2]['duration']) + " seconds")
+            else:
+                screen.fill((92, 244, 255))
+                screen.blit(bg, (0,0))
 
-    #Drawing location to rendered map
-    drawData(iss_latitude, iss_longitude, home_location.latitude, home_location.longitude, past_locationy, past_locationx, m, fig)
+                #GUI-Text
+                latImg = font.render("Latitude:         " + str(iss_latitude) + "°", True, (255, 255, 255))
+                lonImg = font.render("Longitude:          " + str(iss_longitude) + "°", True, (255, 255, 255)) 
+                adress = getadress(iss_latitude, iss_longitude, geolocator)
+                locImg = font.render("Location:         " + str(adress), True, (255, 255, 255))
+                transImg = font.render("Translation:        " + translate(adress), True, (255, 255, 255))
+                distImg = font.render("Distance to you:    " + str(int(distanceAB(home_location.latitude, home_location.longitude, iss_latitude, iss_longitude) * 1.609344)) + " Kilometers", True, (255, 255, 255))
 
-    #Time-delay - at least 1 sec if user-input is 0
-    time.sleep(refresh_rate)
-    time.sleep(1)
+                pepImg = font.render("People on ISS:    " + str(numberPep), True, (255, 255, 255))
+                nameImg = font.render("Names:            " + str(writePep(responsePep, pepjson)), True, (255, 255, 255))
+
+                pass1Img = font.render("Next pass:        " + str(datetime.fromtimestamp((passjson['response'])[0]['risetime'])), True, (255, 255, 255))
+                dur1Img = font.render("Duration:         " + str((passjson['response'])[0]['duration']) + " seconds", True, (255, 255, 255))
+
+                pass2Img = font.render("Second pass:      " + str(datetime.fromtimestamp((passjson['response'])[1]['risetime'])), True, (255, 255, 255))
+                dur2Img = font.render("Duration:         " + str((passjson['response'])[1]['duration']) + " seconds", True, (255, 255, 255))
+
+                pass3Img = font.render("Third pass:       " + str(datetime.fromtimestamp((passjson['response'])[2]['risetime'])), True, (255, 255, 255))
+                dur3Img = font.render("Duration:         " + str((passjson['response'])[2]['duration']) + " seconds", True, (255, 255, 255))
+
+                textImg = [latImg, lonImg, locImg, transImg, distImg, pepImg, nameImg, pass1Img, dur1Img, pass2Img, dur2Img, pass3Img, dur3Img]
+
+            #Drawing location to rendered map
+            drawData(iss_latitude, iss_longitude, home_location.latitude, home_location.longitude, past_locationy, past_locationx, m, fig)
+            
+            if(interface == False):
+                #Time-delay - at least 1 sec if user-input is 0
+                time.sleep(refresh_rate)
+                time.sleep(1)
+            
+        #draw text to screen
+        if(interface):
+            for image in range(len(textImg)):
+                screen.blit(textImg[image], (25, 25 + image * 25))
+                pygame.display.flip()
+                clock.tick(5)
+        
+        main_count += 1
+        
+    if(interface): pygame.quit()
+
 ```
 
