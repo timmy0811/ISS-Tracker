@@ -23,7 +23,9 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This is my first complete Python programm. It is API based and uses NASA's Open-Notify API to print the ISS-data live to the console. Furthermore it renderes a map based on user inputs and the API-data to the current project folder. The render frequency is set also by the users input with at least 1 second delay each period the data gets updated
+Some information may be outdated due to several updates on the GUI, however it's quite fragile, executable also outdated 
+
+This is my first complete and bigger Python programm. It is API based and uses NASA's Open-Notify API to print the ISS-data live to the console. Furthermore it renderes a map based on user inputs and the API-data to the current project folder. The render frequency is set also by the users input with at least 1 second delay each period the data gets updated
 
 <!-- INFORMATION  -->
 ## What does the Information mean?
@@ -61,11 +63,12 @@ When running as Python code you will need Python installed including following m
   * `basemap`
   * `geopy`
   * `googletrans`
+  * `pygame`
   
 The module get imported as following:
 ### imports
 ```python
-import requests, json, time, os, sys
+import requests, json, time, os, sys, pygame
 
 import numpy as np
 import matplotlib.pyplot as plot
